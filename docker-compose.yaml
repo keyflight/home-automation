@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  home-assistant:
+    image: homeassistant/home-assistant:stable
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./services/homeassistant/config:/config
+    ports:
+      - 8123:8123
+
+  mqtt:
+    image: eclipse-mosquitto 
+    volumes:
+      - ./services/mqtt/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    ports:
+      - 1883:1883
+      - 9001:9001
+
+  home-api:
+    image: node:10
+    env_file:
+      - ./environment/home-api.development.env
+    environment:
+      - PORT=3000
+    volumes:
+      - ./services/home-api:/app
+    ports:
+      - 5011:3000
+    command: /app/entrypoint.sh
